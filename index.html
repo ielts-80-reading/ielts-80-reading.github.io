@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Academic Reading - Computer-Delivered Simulation</title>
+    <!-- Tailwind CSS for rapid styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Platform stylesheet -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="font-scale-md">
+
+    <div class="app-container">
+        <!-- TOP NAVIGATION HEADER -->
+        <header class="h-14 bg-[#0f172a] text-white flex items-center justify-between px-4 md:px-6 shadow-md z-30 shrink-0 select-none border-b border-slate-800">
+            <!-- Left Branding & Test Title -->
+            <div class="flex items-center space-x-3">
+                <div class="bg-[#d9222a] text-white font-extrabold text-sm px-2.5 py-1 rounded tracking-wider shadow">IELTS</div>
+                <div class="flex flex-col">
+                    <span class="text-sm font-bold text-slate-100 tracking-tight" id="header-test-title">[VOL 1] Academic Reading - Test 1</span>
+                    <span class="text-[10px] text-slate-400 hidden sm:inline">Official Computer-Delivered Practice Environment</span>
+                </div>
+            </div>
+
+            <!-- Center Reading Ergonomics & Tutor Tools -->
+            <div class="hidden lg:flex items-center space-x-2">
+                <!-- Font Scale Controls -->
+                <div class="flex items-center bg-slate-800/80 rounded-lg p-0.5 border border-slate-700/80 text-xs">
+                    <span class="px-2 text-slate-400 text-[10px] font-semibold uppercase">Text:</span>
+                    <button id="btn-font-sm" onclick="IELTSApp.applyFontSize('sm')" class="px-2 py-0.5 rounded text-slate-300 hover:text-white transition font-medium text-xs">A-</button>
+                    <button id="btn-font-md" onclick="IELTSApp.applyFontSize('md')" class="px-2 py-0.5 rounded bg-blue-600 text-white font-bold text-xs">A</button>
+                    <button id="btn-font-lg" onclick="IELTSApp.applyFontSize('lg')" class="px-2 py-0.5 rounded text-slate-300 hover:text-white transition font-medium text-xs">A+</button>
+                    <button id="btn-font-xl" onclick="IELTSApp.applyFontSize('xl')" class="px-2 py-0.5 rounded text-slate-300 hover:text-white transition font-medium text-xs">A++</button>
+                </div>
+
+                <!-- Theme Contrast Selector -->
+                <div class="flex items-center bg-slate-800/80 rounded-lg p-0.5 border border-slate-700/80 text-xs">
+                    <button onclick="IELTSApp.applyTheme('standard')" class="px-2 py-1 rounded text-slate-300 hover:text-white text-xs font-medium" title="Standard Day Theme">Default</button>
+                    <button onclick="IELTSApp.applyTheme('contrast-dark')" class="px-2 py-1 rounded text-slate-300 hover:text-white text-xs font-medium" title="High Contrast Dark">Dark</button>
+                    <button onclick="IELTSApp.applyTheme('yellow-black')" class="px-2 py-1 rounded text-yellow-300 hover:text-yellow-200 text-xs font-medium" title="Yellow on Black">Contrast</button>
+                </div>
+
+                <!-- Tutor / Content Manager Button -->
+                <button onclick="IELTSApp.openTutorManager()" class="flex items-center space-x-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition" title="Quản lý đề thi & Tạo nội dung">
+                    <svg class="w-3.5 h-3.5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                    <span>Tutor Mode</span>
+                </button>
+            </div>
+
+            <!-- Right: Autosave status & Accurate Wall-Clock Timer -->
+            <div class="flex items-center space-x-3">
+                <div class="hidden sm:flex items-center space-x-1.5 text-xs text-slate-400">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="autosave-status">Autosaved</span>
+                </div>
+
+                <div class="flex items-center space-x-2 bg-slate-900 px-3.5 py-1.5 rounded-full border border-slate-700 shadow-inner">
+                    <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span id="timer-display" class="font-mono text-base font-bold text-yellow-400 tracking-wider">60:00</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- MOBILE RESPONSIVE TOGGLE (Visible on small screens) -->
+        <div class="md:hidden flex bg-slate-200 border-b border-slate-300 p-1 select-none z-20">
+            <button id="mobile-btn-passage" onclick="IELTSApp.setMobileView('passage')" class="flex-1 py-1.5 text-xs font-bold rounded bg-blue-600 text-white shadow-sm transition">Passage Text</button>
+            <button id="mobile-btn-questions" onclick="IELTSApp.setMobileView('questions')" class="flex-1 py-1.5 text-xs font-bold rounded text-slate-700 hover:bg-slate-300 transition">Questions Area</button>
+        </div>
+
+        <!-- MAIN SPLIT WORKSPACE -->
+        <main class="workspace-split" id="workspace-split">
+            
+            <!-- LEFT PANE: READING PASSAGES -->
+            <section id="passage-scroll-pane" class="pane-passage px-6 md:px-8 py-5 select-text">
+                <!-- Sticky Passage Tabs -->
+                <div class="sticky top-0 bg-white/95 backdrop-blur-sm pt-1 pb-3 mb-4 border-b border-slate-200 flex items-center justify-between z-20">
+                    <div class="flex space-x-1.5">
+                        <button id="tab-passage-1" onclick="IELTSApp.switchPassage(1)" class="px-3.5 py-1.5 text-xs font-bold rounded bg-blue-600 text-white shadow-sm transition">Passage 1</button>
+                        <button id="tab-passage-2" onclick="IELTSApp.switchPassage(2)" class="px-3.5 py-1.5 text-xs font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Passage 2</button>
+                        <button id="tab-passage-3" onclick="IELTSApp.switchPassage(3)" class="px-3.5 py-1.5 text-xs font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Passage 3</button>
+                    </div>
+
+                    <div class="text-xs text-slate-400 flex items-center gap-1">
+                        <span>Select text to highlight</span>
+                    </div>
+                </div>
+
+                <!-- Passages dynamically rendered here -->
+                <div id="passage-content-area" class="passage-text space-y-4 text-slate-800 leading-relaxed"></div>
+            </section>
+
+            <!-- DRAGGABLE SPLIT GUTTER / RESIZER -->
+            <div id="split-gutter" class="split-gutter hidden md:flex" title="Kéo để thay đổi kích thước chia màn hình (Double click để cân bằng 50/50)"></div>
+
+            <!-- RIGHT PANE: QUESTIONS & FORM CONTROLS -->
+            <section id="questions-scroll-pane" class="pane-questions px-6 md:px-8 py-5 select-text">
+                <!-- Dynamic questions container -->
+                <div id="questions-content-area"></div>
+            </section>
+        </main>
+
+        <!-- FLOATING HIGHLIGHT TOOLBAR -->
+        <div id="highlight-toolbar" class="hidden absolute bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg shadow-xl z-50 flex items-center space-x-2 border border-slate-700">
+            <button id="hl-btn-yellow" class="flex items-center space-x-1 hover:text-yellow-300 font-semibold px-1 py-0.5 rounded">
+                <span class="w-3 h-3 rounded-full bg-yellow-300 inline-block border border-yellow-500"></span>
+                <span>Yellow</span>
+            </button>
+            <span class="text-slate-600">|</span>
+            <button id="hl-btn-blue" class="flex items-center space-x-1 hover:text-sky-300 font-semibold px-1 py-0.5 rounded">
+                <span class="w-3 h-3 rounded-full bg-sky-300 inline-block border border-sky-500"></span>
+                <span>Blue</span>
+            </button>
+            <span class="text-slate-600">|</span>
+            <button id="hl-btn-clear" class="hover:text-rose-400 font-medium px-1 py-0.5">Clear</button>
+        </div>
+
+        <!-- FOOTER: QUESTION PALETTE & TEST SUBMISSION -->
+        <footer class="h-14 bg-white border-t border-slate-200 flex items-center justify-between px-3 md:px-6 z-30 shrink-0 shadow-inner select-none">
+            <!-- Left: Segmented Question Palette -->
+            <div class="flex items-center space-x-2 overflow-x-auto py-1 max-w-[72%] md:max-w-[82%] xl:max-w-[88%] scrollbar-none">
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider shrink-0 mr-0.5">Questions:</span>
+                
+                <div class="flex items-center space-x-2">
+                    <!-- Passage 1 Palette -->
+                    <div class="flex items-center space-x-1 bg-slate-100/80 px-2 py-1 rounded-md border border-slate-200/80">
+                        <span class="text-[10px] font-bold text-blue-700 mr-1 shrink-0">P1</span>
+                        <div id="palette-p1" class="flex space-x-1"></div>
+                    </div>
+
+                    <!-- Passage 2 Palette -->
+                    <div class="flex items-center space-x-1 bg-slate-100/80 px-2 py-1 rounded-md border border-slate-200/80">
+                        <span class="text-[10px] font-bold text-blue-700 mr-1 shrink-0">P2</span>
+                        <div id="palette-p2" class="flex space-x-1"></div>
+                    </div>
+
+                    <!-- Passage 3 Palette -->
+                    <div class="flex items-center space-x-1 bg-slate-100/80 px-2 py-1 rounded-md border border-slate-200/80">
+                        <span class="text-[10px] font-bold text-blue-700 mr-1 shrink-0">P3</span>
+                        <div id="palette-p3" class="flex space-x-1"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Navigation arrows and Submit Button -->
+            <div class="flex items-center space-x-2 md:space-x-3 shrink-0">
+                <button onclick="IELTSApp.switchPassage(IELTSApp.getState().currentPassage - 1)" class="p-1.5 md:p-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-slate-700 transition" title="Previous Passage (Alt+1/2/3)">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                <button onclick="IELTSApp.switchPassage(IELTSApp.getState().currentPassage + 1)" class="p-1.5 md:p-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-slate-700 transition" title="Next Passage (Alt+1/2/3)">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+
+                <button onclick="IELTSApp.openSubmitModal()" class="flex items-center space-x-1.5 px-3.5 md:px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs md:text-sm shadow-md transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Nộp Bài</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- MODAL 1: SUBMISSION CONFIRMATION -->
+    <div id="submit-confirm-modal" class="modal-backdrop fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in duration-150">
+            <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="w-2.5 h-2.5 bg-emerald-400 rounded-full"></span>
+                    <h3 class="text-base font-bold tracking-tight">Xác nhận nộp bài thi IELTS</h3>
+                </div>
+                <button onclick="IELTSApp.closeModal('submit-confirm-modal')" class="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-5">
+                <p class="text-xs text-slate-600">
+                    Vui lòng kiểm tra lại tình trạng làm bài của bạn trước khi nộp. Điểm số sẽ được chấm tự động theo thang chuẩn IELTS Academic.
+                </p>
+
+                <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                    <div>
+                        <div class="text-3xl font-extrabold text-blue-600" id="modal-answered-count">0</div>
+                        <div class="text-[11px] text-slate-500 uppercase font-bold mt-0.5">Đã trả lời</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-extrabold text-amber-600" id="modal-unanswered-count">40</div>
+                        <div class="text-[11px] text-slate-500 uppercase font-bold mt-0.5">Chưa trả lời</div>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <span class="text-xs font-bold text-slate-600 uppercase">Danh sách câu chưa làm:</span>
+                    <div id="modal-unanswered-list" class="flex flex-wrap gap-1.5 py-1"></div>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 px-6 py-4 flex justify-end space-x-3 border-t border-slate-200">
+                <button onclick="IELTSApp.closeModal('submit-confirm-modal')" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 bg-white hover:bg-slate-100 text-xs font-bold transition">
+                    Tiếp tục làm bài
+                </button>
+                <button onclick="IELTSApp.submitExam()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-md transition">
+                    Xác nhận nộp bài ngay
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: DETAILED RESULTS & EVIDENCE DASHBOARD -->
+    <div id="results-review-modal" class="modal-backdrop fixed inset-0 bg-slate-900/70 hidden items-center justify-center z-50 p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full my-8 max-h-[92vh] flex flex-col overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white px-6 py-5 flex justify-between items-center rounded-t-2xl shrink-0">
+                <div>
+                    <h2 class="text-xl font-bold tracking-tight">KẾT QUẢ THI IELTS ACADEMIC READING</h2>
+                    <p class="text-xs text-blue-200 mt-0.5">Bảng điểm phân tích chi tiết & Dẫn chứng bài đọc</p>
+                </div>
+                <button onclick="IELTSApp.closeModal('results-review-modal')" class="text-white/80 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+
+            <!-- Body -->
+            <div class="p-6 md:p-8 space-y-6 overflow-y-auto">
+                <!-- Score Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-slate-50 border border-slate-200 p-5 rounded-2xl text-center flex flex-col justify-center items-center">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Điểm số thô (Raw Score)</span>
+                        <div class="text-4xl font-black text-blue-600 mt-1" id="res-raw-score">0 / 40</div>
+                        <span class="text-[11px] text-slate-400 mt-1">Số câu trả lời chính xác</span>
+                    </div>
+
+                    <div class="bg-blue-50/70 border border-blue-200 p-5 rounded-2xl text-center flex flex-col justify-center items-center">
+                        <span class="text-xs font-bold text-blue-700 uppercase tracking-widest">Estimated Band Score</span>
+                        <div class="text-5xl font-black text-blue-800 mt-1" id="res-band-score">1.0</div>
+                        <span class="text-[11px] text-blue-600 mt-1">Quy đổi chuẩn Cambridge Academic</span>
+                    </div>
+                </div>
+
+                <!-- Pedagogical Advice -->
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-900 space-y-1">
+                    <div class="font-bold flex items-center gap-1.5 text-amber-800">
+                        <svg class="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"></path>
+                        </svg>
+                        <span>Nhận xét & Khuyến nghị học tập:</span>
+                    </div>
+                    <p id="res-advice-text" class="leading-relaxed"></p>
+                </div>
+
+                <!-- Filter Chips -->
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Chi tiết 40 câu hỏi & Dẫn chứng</h3>
+                    <div class="flex space-x-1 text-xs">
+                        <button id="filter-all-btn" onclick="IELTSApp.renderResultsDashboard('all')" class="px-2.5 py-1 rounded bg-slate-800 text-white font-semibold">All (40)</button>
+                        <button id="filter-correct-btn" onclick="IELTSApp.renderResultsDashboard('correct')" class="px-2.5 py-1 rounded bg-emerald-100 text-emerald-800 hover:bg-emerald-200 font-semibold">Correct</button>
+                        <button id="filter-incorrect-btn" onclick="IELTSApp.renderResultsDashboard('incorrect')" class="px-2.5 py-1 rounded bg-rose-100 text-rose-800 hover:bg-rose-200 font-semibold">Incorrect</button>
+                        <button id="filter-flagged-btn" onclick="IELTSApp.renderResultsDashboard('flagged')" class="px-2.5 py-1 rounded bg-amber-100 text-amber-800 hover:bg-amber-200 font-semibold">Flagged</button>
+                    </div>
+                </div>
+
+                <!-- Breakdown Cards -->
+                <div id="results-breakdown-container" class="space-y-4"></div>
+            </div>
+
+            <!-- Footer -->
+            <div class="bg-slate-50 px-6 py-4 flex justify-between items-center border-t border-slate-200 shrink-0">
+                <button onclick="IELTSApp.clearSession(); IELTSApp.closeModal('results-review-modal');" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 bg-white hover:bg-slate-100 text-xs font-bold transition">
+                    Làm lại bài thi mới
+                </button>
+                <button onclick="IELTSApp.closeModal('results-review-modal')" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition">
+                    Đóng & Xem lại bài làm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: TUTOR MODE & TEST MANAGER -->
+    <div id="tutor-modal" class="modal-backdrop fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col max-h-[88vh]">
+            <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                    <h3 class="text-base font-bold">Tutor Mode - Quản lý & Tạo đề thi IELTS</h3>
+                </div>
+                <button onclick="IELTSApp.closeModal('tutor-modal')" class="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-4">
+                <p class="text-xs text-slate-600">
+                    Giáo viên có thể xuất bộ đề hiện tại ra file JSON, chỉnh sửa đáp án/dẫn chứng, hoặc nhập đề thi mới hoàn toàn vào hệ thống.
+                </p>
+
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-bold text-slate-700 uppercase">Test Data Schema (JSON):</label>
+                        <div class="space-x-2">
+                            <button onclick="IELTSApp.exportTestJSON()" class="text-xs text-blue-600 hover:text-blue-800 font-bold underline">Tải file .json</button>
+                            <button onclick="IELTSApp.resetToDefaultTest()" class="text-xs text-rose-600 hover:text-rose-800 font-bold underline">Khôi phục đề gốc</button>
+                        </div>
+                    </div>
+                    <textarea id="tutor-json-export" class="w-full h-64 border border-slate-300 rounded-lg p-3 font-mono text-xs text-slate-800 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none" spellcheck="false"></textarea>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 px-6 py-4 flex justify-end space-x-3 border-t border-slate-200">
+                <button onclick="IELTSApp.closeModal('tutor-modal')" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 bg-white hover:bg-slate-100 text-xs font-bold transition">
+                    Đóng
+                </button>
+                <button onclick="IELTSApp.importTestJSON()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-md transition">
+                    Lưu & Áp dụng đề thi này
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: KEYBOARD SHORTCUTS -->
+    <div id="shortcuts-modal" class="modal-backdrop fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="text-base font-bold text-slate-800">Phím tắt thao tác nhanh (Shortcuts)</h3>
+                <button onclick="IELTSApp.closeModal('shortcuts-modal')" class="text-gray-400 hover:text-slate-800 text-xl leading-none">&times;</button>
+            </div>
+            <div class="text-xs space-y-2 text-slate-700">
+                <div class="flex justify-between py-1 border-b border-slate-100">
+                    <span class="font-medium">Chuyển sang Passage 1, 2, 3</span>
+                    <kbd class="bg-slate-100 px-2 py-0.5 rounded font-mono font-bold">Alt + 1 / 2 / 3</kbd>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-100">
+                    <span class="font-medium">Gắn cờ xem lại câu hỏi (Flag)</span>
+                    <kbd class="bg-slate-100 px-2 py-0.5 rounded font-mono font-bold">Alt + F</kbd>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-100">
+                    <span class="font-medium">Nộp bài thi</span>
+                    <kbd class="bg-slate-100 px-2 py-0.5 rounded font-mono font-bold">Ctrl + Enter</kbd>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-100">
+                    <span class="font-medium">Đóng cửa sổ Pop-up</span>
+                    <kbd class="bg-slate-100 px-2 py-0.5 rounded font-mono font-bold">Esc</kbd>
+                </div>
+                <div class="flex justify-between py-1">
+                    <span class="font-medium">Mở bảng phím tắt này</span>
+                    <kbd class="bg-slate-100 px-2 py-0.5 rounded font-mono font-bold">?</kbd>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast-notification" class="hidden"></div>
+
+    <!-- APPLICATION SCRIPTS -->
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

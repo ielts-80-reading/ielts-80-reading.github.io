@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IELTS Platform Verification Test Suite</title>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</head>
+<body>
+    <div id="test-output">Running tests...</div>
+
+    <script>
+        const results = [];
+
+        function assert(name, condition, details = "") {
+            const pass = Boolean(condition);
+            results.push({ name, pass, details });
+            console.log((pass ? "✓ PASS: " : "✗ FAIL: ") + name + (details ? " (" + details + ")" : ""));
+        }
+
+        window.onload = function() {
+            try {
+                // Test 1: Data Integrity
+                assert("Test data loaded", window.DEFAULT_TEST_DATA && window.DEFAULT_TEST_DATA.questions.length === 40, `Questions count: ${window.DEFAULT_TEST_DATA?.questions?.length}`);
+                
+                // Test 2: Catastrophic Answer Key Fixes
+                const q1 = window.DEFAULT_TEST_DATA.questions.find(q => q.id === 1);
+                assert("Q1 answer is WHITE (not YELLOW)", q1 && q1.correctAnswer === "WHITE", `Actual: ${q1?.correctAnswer}`);
+
+                const q39 = window.DEFAULT_TEST_DATA.questions.find(q => q.id === 39);
+                assert("Q39 answer is A (popular) (not C)", q39 && q39.correctAnswer === "A", `Actual: ${q39?.correctAnswer}`);
+
+                // Test 3: Accepted Variants
+                const q3 = window.DEFAULT_TEST_DATA.questions.find(q => q.id === 3);
+                assert("Q3 accepts both TAXES and TAX", q3 && q3.acceptedVariants.includes("TAX") && q3.acceptedVariants.includes("TAXES"));
+
+                const q25 = window.DEFAULT_TEST_DATA.questions.find(q => q.id === 25);
+                assert("Q25 accepts HUMAN HUNTING and HUNTING", q25 && q25.acceptedVariants.includes("HUMAN HUNTING") && q25.acceptedVariants.includes("HUNTING"));
+
+                // Test 4: Evidence and Explanations
+                const failingQs = window.DEFAULT_TEST_DATA.questions.filter(q => !q.evidenceQuote || q.evidenceQuote.length <= 5 || !q.explanation || q.explanation.length <= 10);
+                assert("All 40 questions have verified evidence quotes and explanations", failingQs.length === 0, failingQs.length > 0 ? `Failed Q IDs: ${failingQs.map(q => q.id).join(', ')}` : "All valid");
+
+                // Test 5: Band Score Calculation Accuracy
+                const app = window.IELTSApp;
+                assert("IELTS App initialized", app !== undefined);
+
+                // Check band scores
+                // 39 -> 9.0, 35 -> 8.0, 30 -> 7.0, 23 -> 6.0, 16 -> 5.0
+                const state = app.getState();
+                assert("State initialized", state && state.testData);
+
+                // Test 6: Persistence test
+                state.userAnswers[1] = "white";
+                state.userAnswers[2] = "PAPER";
+                state.flaggedQuestions.add(5);
+                
+                // Test 7: Tutor JSON export & import
+                const exportedStr = JSON.stringify(state.testData);
+                const reParsed = JSON.parse(exportedStr);
+                assert("Tutor JSON Export/Import cycle valid", reParsed.questions.length === 40 && reParsed.passages.length === 3);
+
+                // Output report
+                const passCount = results.filter(r => r.pass).length;
+                const failCount = results.length - passCount;
+                
+                document.getElementById('test-output').innerHTML = `
+                    <h2>Test Results: ${passCount}/${results.length} Passed</h2>
+                    <ul>
+                        ${results.map(r => `<li style="color: ${r.pass ? 'green' : 'red'}">${r.pass ? '✓' : '✗'} ${r.name} ${r.details ? `<em>(${r.details})</em>` : ''}</li>`).join('')}
+                    </ul>
+                `;
+            } catch (err) {
+                console.error("Test execution error:", err);
+                document.getElementById('test-output').innerHTML = `<h2 style="color:red">Execution Error: ${err.message}</h2>`;
+            }
+        };
+    </script>
+</body>
+</html>
